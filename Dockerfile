@@ -16,7 +16,7 @@ RUN pnpm i
 COPY . .
 
 # Expose the port the app runs on
-EXPOSE 10000
+EXPOSE 5000
 
 # Run the app
 
