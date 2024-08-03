@@ -4,11 +4,11 @@ import { connectToMongo } from "./src/config/db.js";
 
 const PORT = process.env.PORT || 5000;
 
-connectToMongo()
+await connectToMongo()
   .then(() => {
     try {
       console.log("Connected to MongoDB");
-      app.listen(PORT, "0.0.0.0", () => {
+      app.listen(PORT, () => {
         console.log(`Server is running on : http://localhost:${PORT}`);
       });
     } catch (error) {
