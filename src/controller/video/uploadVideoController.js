@@ -1,48 +1,49 @@
-import axios from "axios";
+import { uploadQueue } from "../../config/queue.js";
+import { socket } from "../../config/socket.js";
 import Video from "../../models/Video.js";
-import fs from "fs";
 
 // route for uploading a file  /video/upload
 export default async function (req, res) {
   try {
-    const user = req.verify;
-    const uploadedFile = req.file;
-    console.log(uploadedFile);
+    try {
+      const { originalname, user, uploadId } = req.body;
 
-    // const formData = new FormData();
+      const newVideo = new Video({
+        userId: user.uid,
+        videoId: `${originalname}_master.m3u8`,
+        expiresAt: user.signInMethod === "guest" ? user.expiresAt : undefined,
+      });
 
-    const fileStream = fs.createReadStream(uploadedFile.path);
-    // formData.append("video", fileStream);
-    // const readStream = fs.createReadStream(filePath);
-    // readStream.pipe(res);
+      await newVideo.save();
 
-    const payload = await axios({
-      method: "post",
-      url: "https://upload.thatawesomekk.eu.org/api/video/upload",
-      headers: {
-        "Content-Type": "application/octet-stream",
-      },
-      data: fileStream,
-      maxContentLength: Infinity, // Required for large files
-      maxBodyLength: Infinity, // Required for large files
-    }).then((resp) => resp.data);
+      socket.connect();
 
-    console.log(payload);
+      if (socket.connected) {
+        socket.emit("connect-metadata", {
+          uploadId,
+        });
+      }
 
-    const newVideo = new Video({
-      userId: user.uid,
-      videoId: payload.fileName,
-    });
+      uploadQueue.push({
+        id: uploadId,
+        filename: originalname,
+      });
 
-    await newVideo.save();
-
-    // console.log(vid.data);
-    return res.status(200).json({
-      success: true,
-      message: "Video uploadeded!",
-      videoId: newVideo._id,
-    });
+      return res.status(200).json({
+        success: true,
+        message: "Video uploading!",
+        videoId: newVideo._id,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error",
+      });
+    }
   } catch (error) {
+    console.log(error);
+
     console.log(error.response);
   }
 }

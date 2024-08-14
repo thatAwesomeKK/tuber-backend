@@ -1,10 +1,10 @@
-import { GetMinimumProfile } from "@thatawesomekk/single-sign-on";
 import Video from "../../models/Video.js";
+import { getMinimumProfile } from "@thatawesomekk/single-sign-on";
 
 export default async function (req, res) {
   try {
-    const vids = await Video.find({isPublished: true}).select(
-      "title thumbnail likes videoId userId"
+    const vids = await Video.find({ isPublished: true }).select(
+      "title thumbnail likes videoId userId createdAt views"
     );
 
     if (!vids) {
@@ -14,10 +14,13 @@ export default async function (req, res) {
       });
     }
 
+    const userIds = vids.map((video) => video.userId);
+
+    const payload = await fetchAuthor(userIds).then((res) => res.users);
+
     for (let i = 0; i < vids.length; i++) {
       const video = vids[i];
-      const payload = await fetchAuthor(video.userId);
-      const user = payload.user;
+      const user = payload.find((user) => user.uid === video.userId);
       video._doc.userId = user;
     }
 
@@ -34,6 +37,6 @@ export default async function (req, res) {
   }
 }
 
-const fetchAuthor = async (userId) => {
-  return await GetMinimumProfile(userId)
+const fetchAuthor = async (userIds) => {
+  return await getMinimumProfile(userIds);
 };

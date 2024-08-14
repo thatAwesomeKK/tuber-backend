@@ -8,25 +8,19 @@ export default async function (req, res) {
   try {
     const { filename, thumbnail } = req.body;
 
-    console.log(filename);
-
     const updateVideo = await Video.findOneAndUpdate(
       {
         videoId: filename,
       },
-      { isPublished: true, thumbnail }
+      { thumbnail }
     );
 
-    const index = uploadQueue.findIndex((item) =>
+    const uploadId = uploadQueue.find((item) =>
       filename.includes(item.filename)
-    );
+    ).id;
+    console.log("UploadId: " + uploadId);
 
-    const uploadId = uploadQueue[index].id;
-
-    uploadQueue.splice(index, 1);
-
-    socket.emit("process-complete", { uploadId });
-    socket.disconnect();
+    socket.emit("thumbnail-complete", { uploadId, thumbnail });
 
     res.status(200).send("ok");
   } catch (error) {

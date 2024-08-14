@@ -1,37 +1,33 @@
 import { Router } from "express";
 const router = Router();
 import uploadVideoController from "../controller/video/uploadVideoController.js";
-import { verifyAccessToken } from "../middleware/verifyAccessToken.js";
 import updateMetadataController from "../controller/video/updateMetadataController.js";
 import fetchVideoMetadataController from "../controller/video/fetchVideoMetadataController.js";
 import streamVideoController from "../controller/video/streamVideoController.js";
 import fetchAllVideos from "../controller/video/fetchAllVideos.js";
 import deleteVideoController from "../controller/video/deleteVideoController.js";
-import multer from "multer";
-import Video from "../models/Video.js";
-const upload = multer({ dest: "temp/" });
+import uploadVideoComplete from "../controller/video/uploadVideoComplete.js";
+import streamMetadataController from "../controller/video/streamMetadataController.js";
+import fetchVideoByTagController from "../controller/video/fetchVideoByTagController.js";
+import handleViewCountController from "../controller/video/handleViewCountController.js";
+import handleLikeController from "../controller/video/handleLikeController.js";
+import handleDislikeController from "../controller/video/handleDislikeController.js";
 
-router.post(
-  "/upload",
-  verifyAccessToken,
-  upload.single("video"),
-  uploadVideoController
-);
-router.post("/fetch-metadata", verifyAccessToken, fetchVideoMetadataController);
-router.post("/metadata", verifyAccessToken, updateMetadataController);
+router.post("/upload", uploadVideoController);
+router.post("/upload-complete", uploadVideoComplete);
+router.put("/update-metadata/:id", updateMetadataController);
+router.get("/fetch-metadata/:id", fetchVideoMetadataController);
+
+router.put("/handle-like", handleLikeController);
+router.put("/handle-dislike", handleDislikeController);
+
+router.put("/handle-view-count/:id", handleViewCountController);
 
 router.get("/stream/:filename", streamVideoController);
-router.get("/stream-metadata", async (req, res) => {
-  const { fileid } = req.query;
-  const video = await Video.findById(fileid).select("videoId");
-  const videoId = video.videoId;
-  return res.status(200).json({
-    success: true,
-    videoId,
-  });
-});
+router.get("/stream-metadata", streamMetadataController);
 router.get("/fetch", fetchAllVideos);
+router.get("/fetch-by-tag/:id", fetchVideoByTagController);
 
-router.delete("/delete/:videoId", verifyAccessToken, deleteVideoController);
+router.delete("/delete/:videoId", deleteVideoController);
 
 export default router;

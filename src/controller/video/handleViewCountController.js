@@ -1,4 +1,3 @@
-import { getMinimumProfile } from "@thatawesomekk/single-sign-on";
 import Video from "../../models/Video.js";
 
 export default async function (req, res) {
@@ -18,22 +17,23 @@ export default async function (req, res) {
       });
     }
 
-    const payload = await fetchAuthor(foundVideo.userId);
-
-    const user = payload.users[0];
-
-    foundVideo._doc.userId = user;
-
-    return res.status(200).json({ success: true, video: foundVideo });
+    await Video.findOneAndUpdate(
+      { _id: foundVideo._id },
+      {
+        $inc: {
+          views: 1,
+        },
+      }
+    );
+    return res.status(200).json({
+      success: true,
+      message: "View count updated",
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: "Internal server error",
     });
   }
 }
-
-const fetchAuthor = async (userId) => {
-  return await getMinimumProfile(userId);
-};

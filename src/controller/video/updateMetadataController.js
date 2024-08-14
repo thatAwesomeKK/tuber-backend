@@ -3,10 +3,8 @@ import Video from "../../models/Video.js";
 
 export default async function (req, res) {
   try {
-    const user = req.verify;
-    const { title, description, videoId, thumbnail } = req.body;
-
-    console.log("videoId: ", videoId);
+    const { title, description, tags, thumbnail } = req.body;
+    const videoId = req.params.id;
 
     const foundVideo = await Video.findOne({ videoId: videoId });
     if (!foundVideo) {
@@ -20,6 +18,7 @@ export default async function (req, res) {
 
     if (title) newMetadata.title = title;
     if (description) newMetadata.description = description;
+    if (tags) newMetadata.tags = tags;
     if (thumbnail) {
       const response = await cloudinary.uploader.upload(thumbnail, {
         upload_preset: "vmbhsyoa",

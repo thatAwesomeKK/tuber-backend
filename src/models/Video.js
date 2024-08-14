@@ -21,18 +21,32 @@ export const videoSchema = new mongoose.Schema(
     },
     thumbnail: {
       type: String,
-      default:
-        "https://i.ytimg.com/vi/4nVDijlvVG0/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDOMfXeLp85kb4gy1ZlTmzU05rKAQ",
+    },
+    views: {
+      type: Number,
+      default: 0,
     },
     likes: {
       type: Array,
+      default: [],
+    },
+    dislikes: {
+      type: Array,
+      default: [],
+    },
+    tags: {
+      type: Array,
+      default: [],
     },
     isPublished: {
       type: Boolean,
       default: false,
     },
+    expiresAt: { type: Date },
   },
   { timestamps: true }
 );
+
+videoSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export default mongoose.model("video", videoSchema);
