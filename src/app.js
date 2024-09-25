@@ -5,6 +5,7 @@ import videoRouter from "./routes/video.js";
 import userRouter from "./routes/user.js";
 import hookRouter from "./routes/hook.js";
 import commentRouter from "./routes/comment.js";
+import playlistRouter from "./routes/playlist.js";
 import cookieParser from "cookie-parser";
 
 const app = express();
@@ -26,6 +27,7 @@ app.get("/", (req, res) => {
 app.use("/api/video", videoRouter);
 app.use("/api/comment", commentRouter);
 app.use("/api/user", userRouter);
+app.use("/api/playlist", playlistRouter);
 app.use("/api/hook", hookRouter);
 
 export default app;

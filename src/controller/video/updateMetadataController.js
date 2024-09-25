@@ -6,7 +6,7 @@ export default async function (req, res) {
     const { title, description, tags, thumbnail } = req.body;
     const videoId = req.params.id;
 
-    const foundVideo = await Video.findOne({ videoId: videoId });
+    const foundVideo = await Video.findById(videoId);
     if (!foundVideo) {
       return res.status(404).json({
         success: false,

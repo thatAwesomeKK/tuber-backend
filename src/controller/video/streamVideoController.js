@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import Video from "../../models/Video.js";
 
 const conn = mongoose.connection;
 let gridFSBucket;
@@ -16,7 +15,7 @@ export default async function (req, res) {
   try {
     const { filename } = req.params;
     const file = gridFSBucket.openDownloadStreamByName(filename);
-    if(!file){
+    if (!file) {
       return res.status(400).send("No Video Found");
     }
     file.pipe(res);

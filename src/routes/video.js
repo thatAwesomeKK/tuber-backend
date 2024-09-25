@@ -12,6 +12,7 @@ import fetchVideoByTagController from "../controller/video/fetchVideoByTagContro
 import handleViewCountController from "../controller/video/handleViewCountController.js";
 import handleLikeController from "../controller/video/handleLikeController.js";
 import handleDislikeController from "../controller/video/handleDislikeController.js";
+import searchVideoController from "../controller/video/searchVideoController.js";
 
 router.post("/upload", uploadVideoController);
 router.post("/upload-complete", uploadVideoComplete);
@@ -27,6 +28,7 @@ router.get("/stream/:filename", streamVideoController);
 router.get("/stream-metadata", streamMetadataController);
 router.get("/fetch", fetchAllVideos);
 router.get("/fetch-by-tag/:id", fetchVideoByTagController);
+router.get("/search", searchVideoController);
 
 router.delete("/delete/:videoId", deleteVideoController);
 
